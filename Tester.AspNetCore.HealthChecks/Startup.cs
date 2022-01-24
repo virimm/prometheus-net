@@ -9,50 +9,44 @@ using System;
 
 namespace Tester.AspNetCore.HealthChecks
 {
-    public class Startup
-    {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+	public class Startup
+	{
+		public Startup( IConfiguration configuration ) {
+			Configuration = configuration;
+		}
 
-        public IConfiguration Configuration { get; }
+		public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddControllers();
+		// This method gets called by the runtime. Use this method to add services to the container.
+		public void ConfigureServices( IServiceCollection services ) {
+			services.AddControllers();
 
-            services.AddHealthChecks()
-                .AddCheck<RandomResultCheck>("random_check")
-                .ForwardToPrometheus();
-            
-            services.Configure<HealthCheckPublisherOptions>(options =>
-            {
-                options.Delay = TimeSpan.Zero;
-            });
-        }
+			services.AddHealthChecks()
+				.AddCheck<RandomResultCheck>( "random_check" )
+				.ForwardToPrometheus();
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+			services.Configure<HealthCheckPublisherOptions>( options => {
+				options.Delay = TimeSpan.Zero;
+			} );
+		}
 
-            app.UseHttpsRedirection();
+		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+		public void Configure( IApplicationBuilder app, IWebHostEnvironment env ) {
+			if ( env.IsDevelopment() ) {
+				app.UseDeveloperExceptionPage();
+			}
 
-            app.UseRouting();
+			app.UseHttpsRedirection();
 
-            app.UseAuthorization();
+			app.UseRouting();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-                endpoints.MapMetrics();
-                endpoints.MapHealthChecks("/health");
-            });
-        }
-    }
+			app.UseAuthorization();
+
+			app.UseEndpoints( endpoints => {
+				endpoints.MapControllers();
+				endpoints.MapMetrics();
+				endpoints.MapHealthChecks( "/health" );
+			} );
+		}
+	}
 }

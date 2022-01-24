@@ -1,6 +1,6 @@
 ﻿namespace Prometheus
 {
-    public interface ISummary : IObserver
-    {
-    }
+	public interface ISummary : IObserver
+	{
+	}
 }

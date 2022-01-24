@@ -1,127 +1,117 @@
-﻿using System.Net.Http;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Prometheus.HttpClientMetrics;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Prometheus.HttpClientMetrics;
 
 namespace Prometheus.Tests.HttpClientMetrics
 {
-    [TestClass]
-    public class HttpClientResponseDurationHandlerTests
-    {
-        [TestMethod]
-        public async Task OnRequest_IncrementsHistogramCountAndSum()
-        {
-            var registry = Metrics.NewCustomRegistry();
+	[TestClass]
+	public class HttpClientResponseDurationHandlerTests
+	{
+		[TestMethod]
+		public async Task OnRequest_IncrementsHistogramCountAndSum() {
+			var registry = Metrics.NewCustomRegistry();
 
-            var options = new HttpClientResponseDurationOptions
-            {
-                Registry = registry
-            };
+			var options = new HttpClientResponseDurationOptions {
+				Registry = registry
+			};
 
-            var handler = new HttpClientResponseDurationHandler(options, HttpClientIdentity.Default);
+			var handler = new HttpClientResponseDurationHandler( options, HttpClientIdentity.Default );
 
-            // As we are not using the HttpClientProvider for constructing our pipeline, we need to do this manually.
-            handler.InnerHandler = new HttpClientHandler();
+			// As we are not using the HttpClientProvider for constructing our pipeline, we need to do this manually.
+			handler.InnerHandler = new HttpClientHandler();
 
-            var client = new HttpClient(handler);
-            await client.GetAsync(ConnectivityCheck.Url);
+			var client = new HttpClient( handler );
+			await client.GetAsync( ConnectivityCheck.Url );
 
-            Assert.AreEqual(1, handler._metric.WithLabels("GET", ConnectivityCheck.Host, HttpClientIdentity.Default.Name, ConnectivityCheck.ExpectedResponseCode).Count);
-            Assert.IsTrue(handler._metric.WithLabels("GET", ConnectivityCheck.Host, HttpClientIdentity.Default.Name, ConnectivityCheck.ExpectedResponseCode).Sum > 0);
-        }
-        
-        [TestMethod]
-        public async Task OnRequest_AwaitsResponseReadingToFinish_ThenRecordsDuration()
-        {
-            var registry = Metrics.NewCustomRegistry();
+			Assert.AreEqual( 1, handler._metric.WithLabels( "GET", ConnectivityCheck.Host, HttpClientIdentity.Default.Name, ConnectivityCheck.ExpectedResponseCode ).Count );
+			Assert.IsTrue( handler._metric.WithLabels( "GET", ConnectivityCheck.Host, HttpClientIdentity.Default.Name, ConnectivityCheck.ExpectedResponseCode ).Sum > 0 );
+		}
 
-            var options = new HttpClientResponseDurationOptions
-            {
-                Registry = registry
-            };
+		[TestMethod]
+		public async Task OnRequest_AwaitsResponseReadingToFinish_ThenRecordsDuration() {
+			var registry = Metrics.NewCustomRegistry();
 
-            var handler = new HttpClientResponseDurationHandler(options, HttpClientIdentity.Default);
+			var options = new HttpClientResponseDurationOptions {
+				Registry = registry
+			};
 
-            // Use a mock client handler so we can control when the task completes
-            var mockHttpClientHandler = new MockHttpClientHandler();
-            handler.InnerHandler = mockHttpClientHandler;
+			var handler = new HttpClientResponseDurationHandler( options, HttpClientIdentity.Default );
 
-            var client = new HttpClient(handler);
-            var requestTask = client.GetAsync(ConnectivityCheck.Url, HttpCompletionOption.ResponseHeadersRead);
+			// Use a mock client handler so we can control when the task completes
+			var mockHttpClientHandler = new MockHttpClientHandler();
+			handler.InnerHandler = mockHttpClientHandler;
 
-            // There should be no duration metric recorded unless the task is completed.
-            Assert.AreEqual(0, handler._metric.WithLabels("GET", ConnectivityCheck.Host, HttpClientIdentity.Default.Name, ConnectivityCheck.ExpectedResponseCode).Count);
-            
-            mockHttpClientHandler.Complete();
+			var client = new HttpClient( handler );
+			var requestTask = client.GetAsync( ConnectivityCheck.Url, HttpCompletionOption.ResponseHeadersRead );
 
-            // There should be no duration metric recorded unless the response is actually read or disposed.
-            Assert.AreEqual(0, handler._metric.WithLabels("GET", ConnectivityCheck.Host, HttpClientIdentity.Default.Name, ConnectivityCheck.ExpectedResponseCode).Count);
+			// There should be no duration metric recorded unless the task is completed.
+			Assert.AreEqual( 0, handler._metric.WithLabels( "GET", ConnectivityCheck.Host, HttpClientIdentity.Default.Name, ConnectivityCheck.ExpectedResponseCode ).Count );
 
-            var response = await requestTask;
+			mockHttpClientHandler.Complete();
 
-            await response.Content.ReadAsStringAsync();
+			// There should be no duration metric recorded unless the response is actually read or disposed.
+			Assert.AreEqual( 0, handler._metric.WithLabels( "GET", ConnectivityCheck.Host, HttpClientIdentity.Default.Name, ConnectivityCheck.ExpectedResponseCode ).Count );
 
-            // Now that we have finished reading it, it should show up.
-            Assert.AreEqual(1, handler._metric.WithLabels("GET", ConnectivityCheck.Host, HttpClientIdentity.Default.Name, ConnectivityCheck.ExpectedResponseCode).Count);
-        }
+			var response = await requestTask;
 
-        [TestMethod]
-        public async Task OnRequest_AwaitsResponseDisposal_ThenRecordsDuration()
-        {
-            var registry = Metrics.NewCustomRegistry();
+			await response.Content.ReadAsStringAsync();
 
-            var options = new HttpClientResponseDurationOptions
-            {
-                Registry = registry
-            };
+			// Now that we have finished reading it, it should show up.
+			Assert.AreEqual( 1, handler._metric.WithLabels( "GET", ConnectivityCheck.Host, HttpClientIdentity.Default.Name, ConnectivityCheck.ExpectedResponseCode ).Count );
+		}
 
-            var handler = new HttpClientResponseDurationHandler(options, HttpClientIdentity.Default);
+		[TestMethod]
+		public async Task OnRequest_AwaitsResponseDisposal_ThenRecordsDuration() {
+			var registry = Metrics.NewCustomRegistry();
 
-            // Use a mock client handler so we can control when the task completes
-            var mockHttpClientHandler = new MockHttpClientHandler();
-            handler.InnerHandler = mockHttpClientHandler;
+			var options = new HttpClientResponseDurationOptions {
+				Registry = registry
+			};
 
-            var client = new HttpClient(handler);
-            var requestTask = client.GetAsync(ConnectivityCheck.Url, HttpCompletionOption.ResponseHeadersRead);
+			var handler = new HttpClientResponseDurationHandler( options, HttpClientIdentity.Default );
 
-            // There should be no duration metric recorded unless the task is completed.
-            Assert.AreEqual(0, handler._metric.WithLabels("GET", ConnectivityCheck.Host, HttpClientIdentity.Default.Name, ConnectivityCheck.ExpectedResponseCode).Count);
+			// Use a mock client handler so we can control when the task completes
+			var mockHttpClientHandler = new MockHttpClientHandler();
+			handler.InnerHandler = mockHttpClientHandler;
 
-            mockHttpClientHandler.Complete();
+			var client = new HttpClient( handler );
+			var requestTask = client.GetAsync( ConnectivityCheck.Url, HttpCompletionOption.ResponseHeadersRead );
 
-            // There should be no duration metric recorded unless the response is actually read or disposed.
-            Assert.AreEqual(0, handler._metric.WithLabels("GET", ConnectivityCheck.Host, HttpClientIdentity.Default.Name, ConnectivityCheck.ExpectedResponseCode).Count);
+			// There should be no duration metric recorded unless the task is completed.
+			Assert.AreEqual( 0, handler._metric.WithLabels( "GET", ConnectivityCheck.Host, HttpClientIdentity.Default.Name, ConnectivityCheck.ExpectedResponseCode ).Count );
 
-            var response = await requestTask;
+			mockHttpClientHandler.Complete();
 
-            response.Dispose();
+			// There should be no duration metric recorded unless the response is actually read or disposed.
+			Assert.AreEqual( 0, handler._metric.WithLabels( "GET", ConnectivityCheck.Host, HttpClientIdentity.Default.Name, ConnectivityCheck.ExpectedResponseCode ).Count );
 
-            // Now that we have disposed it, it should show up.
-            Assert.AreEqual(1, handler._metric.WithLabels("GET", ConnectivityCheck.Host, HttpClientIdentity.Default.Name, ConnectivityCheck.ExpectedResponseCode).Count);
-        }
+			var response = await requestTask;
 
-        private class MockHttpClientHandler : HttpClientHandler
-        {
-            private readonly TaskCompletionSource<HttpResponseMessage> _taskCompletionSource;
+			response.Dispose();
 
-            public MockHttpClientHandler()
-            {
-                _taskCompletionSource = new TaskCompletionSource<HttpResponseMessage>();
-            }
+			// Now that we have disposed it, it should show up.
+			Assert.AreEqual( 1, handler._metric.WithLabels( "GET", ConnectivityCheck.Host, HttpClientIdentity.Default.Name, ConnectivityCheck.ExpectedResponseCode ).Count );
+		}
 
-            public void Complete()
-            {
-                _taskCompletionSource.SetResult(new HttpResponseMessage
-                {
-                    Content = new StringContent("test content")
-                });
-            }
-            
-            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-            {
-                return _taskCompletionSource.Task;
-            }
-        }
-    }
+		private class MockHttpClientHandler : HttpClientHandler
+		{
+			private readonly TaskCompletionSource<HttpResponseMessage> _taskCompletionSource;
+
+			public MockHttpClientHandler() {
+				_taskCompletionSource = new TaskCompletionSource<HttpResponseMessage>();
+			}
+
+			public void Complete() {
+				_taskCompletionSource.SetResult( new HttpResponseMessage {
+					Content = new StringContent( "test content" )
+				} );
+			}
+
+			protected override Task<HttpResponseMessage> SendAsync( HttpRequestMessage request, CancellationToken cancellationToken ) {
+				return _taskCompletionSource.Task;
+			}
+		}
+	}
 }

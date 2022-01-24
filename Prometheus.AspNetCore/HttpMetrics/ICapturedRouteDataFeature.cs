@@ -2,8 +2,8 @@
 
 namespace Prometheus.HttpMetrics
 {
-    interface ICapturedRouteDataFeature
-    {
-        RouteValueDictionary Values { get; }
-    }
+	interface ICapturedRouteDataFeature
+	{
+		RouteValueDictionary Values { get; }
+	}
 }
