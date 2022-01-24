@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 
@@ -71,13 +72,10 @@ namespace Prometheus.HttpClientMetrics
 				case HttpClientRequestLabelNames.Method:
 					labelValues[ i ] = request.Method.Method;
 					break;
-				case HttpClientRequestLabelNames.Host:
-					labelValues[ i ] = request.RequestUri.Host;
+				case HttpClientRequestLabelNames.Uri:
+					labelValues[ i ] = request.RequestUri.AbsolutePath;
 					break;
-				case HttpClientRequestLabelNames.Client:
-					labelValues[ i ] = _identity.Name;
-					break;
-				case HttpClientRequestLabelNames.Code:
+				case HttpClientRequestLabelNames.Status:
 					labelValues[ i ] = response != null ? ( (int)response.StatusCode ).ToString() : "";
 					break;
 				default:
@@ -98,6 +96,19 @@ namespace Prometheus.HttpClientMetrics
 
 			if ( unexpected.Any() )
 				throw new ArgumentException( $"Provided custom HttpClient metric instance for {GetType().Name} has some unexpected labels: {string.Join( ", ", unexpected )}." );
+		}
+
+		private T GetFirstHeaderValueOrDefault<T>( HttpRequestMessage response, string headerKey, T defaultValue ) {
+			if ( !response.Content.Headers.TryGetValues( headerKey, out IEnumerable<string> headerValues ) ) {
+				return defaultValue;
+			}
+
+			var valueString = headerValues.FirstOrDefault();
+			if ( valueString != null ) {
+				return (T)Convert.ChangeType( valueString, typeof( T ) );
+			}
+
+			return defaultValue;
 		}
 	}
 }

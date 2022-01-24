@@ -6,16 +6,14 @@ namespace Prometheus.HttpClientMetrics
 	public static class HttpClientRequestLabelNames
 	{
 		public const string Method = "method";
-		public const string Host = "host";
-		public const string Client = "client";
-		public const string Code = "code";
+		public const string Uri = "uri";
+		public const string Status = "status";
 
 		public static readonly string[] All =
 		{
 			Method,
-			Host,
-			Client,
-			Code
+			Uri,
+			Status
 		};
 
 		// The labels known before receiving the response.
@@ -23,8 +21,7 @@ namespace Prometheus.HttpClientMetrics
 		public static readonly string[] KnownInAdvance =
 		{
 			Method,
-			Host,
-			Client
+			Uri
 		};
 	}
 }

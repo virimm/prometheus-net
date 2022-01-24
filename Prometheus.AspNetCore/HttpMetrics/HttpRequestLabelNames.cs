@@ -7,15 +7,13 @@ namespace Prometheus.HttpMetrics
 	{
 		public const string Code = "code";
 		public const string Method = "method";
-		public const string Controller = "controller";
-		public const string Action = "action";
+		public const string Uri = "uri";
 
 		public static readonly string[] All =
 		{
 			Code,
 			Method,
-			Controller,
-			Action
+			Uri
 		};
 
 		internal static readonly string[] PotentiallyAvailableBeforeExecutingFinalHandler =
@@ -23,8 +21,7 @@ namespace Prometheus.HttpMetrics
             // Always available, part of request.
             Method,
             // These two are available only in ASP.NET Core 3.
-            Controller,
-			Action
+            Uri
 		};
 
 		// Labels that do not need routing information to be collected.

@@ -13,7 +13,7 @@ namespace Prometheus
 	/// </remarks>
 	public sealed class Histogram : Collector<Histogram.Child>, IHistogram
 	{
-		private static readonly double[] DefaultBuckets = { .005, .01, .025, .05, .075, .1, .25, .5, .75, 1, 2.5, 5, 7.5, 10 };
+		private static readonly double[] DefaultBuckets = { .005, .01, .02, .05, .07, .1, .2 };
 		private readonly double[] _buckets;
 
 		internal Histogram( string name, string help, string[]? labelNames, Labels staticLabels, bool suppressInitialValue, double[]? buckets )

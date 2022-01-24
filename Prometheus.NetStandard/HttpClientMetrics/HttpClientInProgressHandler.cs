@@ -19,7 +19,7 @@ namespace Prometheus.HttpClientMetrics
 		protected override string[] DefaultLabels => HttpClientRequestLabelNames.KnownInAdvance;
 
 		protected override ICollector<IGauge> CreateMetricInstance( string[] labelNames ) => MetricFactory.CreateGauge(
-			"httpclient_requests_in_progress",
+			"http_out_requests_active",
 			"Number of requests currently being executed by an HttpClient.",
 			new GaugeConfiguration {
 				LabelNames = labelNames

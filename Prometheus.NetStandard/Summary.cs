@@ -17,7 +17,7 @@ namespace Prometheus
 		/// Client library guidelines say that the summary should default to not measuring quantiles.
 		/// https://prometheus.io/docs/instrumenting/writing_clientlibs/#summary
 		/// </summary>
-		internal static readonly QuantileEpsilonPair[] DefObjectivesArray = new QuantileEpsilonPair[ 0 ];
+		internal static readonly QuantileEpsilonPair[] DefObjectivesArray = Array.Empty<QuantileEpsilonPair>();
 
 		// Default Summary quantile values.
 		public static readonly IList<QuantileEpsilonPair> DefObjectives = new List<QuantileEpsilonPair>( DefObjectivesArray );

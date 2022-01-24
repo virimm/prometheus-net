@@ -110,7 +110,7 @@ namespace Prometheus
 			}
 		}
 
-		private KeyValuePair<string, string>[] _staticLabels = new KeyValuePair<string, string>[ 0 ];
+		private KeyValuePair<string, string>[] _staticLabels = Array.Empty<KeyValuePair<string, string>>();
 		private readonly ReaderWriterLockSlim _staticLabelsLock = new ReaderWriterLockSlim();
 
 		/// <summary>

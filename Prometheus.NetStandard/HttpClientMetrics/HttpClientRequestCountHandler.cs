@@ -24,7 +24,7 @@ namespace Prometheus.HttpClientMetrics
 		protected override string[] DefaultLabels => HttpClientRequestLabelNames.All;
 
 		protected override ICollector<ICounter> CreateMetricInstance( string[] labelNames ) => MetricFactory.CreateCounter(
-			"httpclient_requests_sent_total",
+			"http_out_requests_total",
 			"Count of HTTP requests that have been completed by an HttpClient.",
 			new CounterConfiguration {
 				LabelNames = labelNames

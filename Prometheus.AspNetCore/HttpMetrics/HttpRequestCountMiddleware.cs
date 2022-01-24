@@ -27,7 +27,7 @@ namespace Prometheus.HttpMetrics
 		protected override string[] DefaultLabels => HttpRequestLabelNames.All;
 
 		protected override ICollector<ICounter> CreateMetricInstance( string[] labelNames ) => MetricFactory.CreateCounter(
-			"http_requests_received_total",
+			"http_in_requests_total",
 			"Provides the count of HTTP requests that have been processed by the ASP.NET Core pipeline.",
 			new CounterConfiguration {
 				LabelNames = labelNames

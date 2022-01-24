@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace Prometheus.HttpMetrics
 {
@@ -116,6 +118,9 @@ namespace Prometheus.HttpMetrics
 					break;
 				case HttpRequestLabelNames.Code:
 					labelValues[ i ] = context.Response.StatusCode.ToString( CultureInfo.InvariantCulture );
+					break;
+				case HttpRequestLabelNames.Uri:
+					labelValues[ i ] = GetRouteName( context );
 					break;
 				default:
 					// We validate the label set on initialization, so if we get to this point it must be either:
@@ -240,6 +245,13 @@ namespace Prometheus.HttpMetrics
 
 			if ( unexpected.Any() )
 				throw new ArgumentException( $"Provided custom HTTP request metric instance for {GetType().Name} has some unexpected labels: {string.Join( ", ", unexpected )}." );
+		}
+
+		private string GetRouteName( HttpContext context ) {
+			var endpoint = context.Features.Get<IEndpointFeature>()?.Endpoint as RouteEndpoint;
+			var routeName = endpoint?.RoutePattern.RawText;
+
+			return routeName ?? context.Request.Path.ToString();
 		}
 	}
 }

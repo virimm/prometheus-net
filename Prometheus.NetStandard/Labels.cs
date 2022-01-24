@@ -16,7 +16,7 @@ namespace Prometheus
 	/// </remarks>
 	internal struct Labels : IEquatable<Labels>
 	{
-		public static readonly Labels Empty = new Labels( new string[ 0 ], new string[ 0 ] );
+		public static readonly Labels Empty = new Labels( Array.Empty<string>(), Array.Empty<string>() );
 
 		public int Count => Names.Length;
 

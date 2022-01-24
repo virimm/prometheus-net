@@ -35,7 +35,7 @@ namespace Prometheus
 		// Used by ChildBase.Remove()
 		internal abstract void RemoveLabelled( Labels labels );
 
-		private static readonly string[] EmptyLabelNames = new string[ 0 ];
+		private static readonly string[] EmptyLabelNames = Array.Empty<string>();
 
 		private const string ValidMetricNameExpression = "^[a-zA-Z_:][a-zA-Z0-9_:]*$";
 		private const string ValidLabelNameExpression = "^[a-zA-Z_:][a-zA-Z0-9_:]*$";
@@ -154,7 +154,7 @@ namespace Prometheus
 			_unlabelledLazy = new Lazy<TChild>( () => GetOrAddLabelled( Prometheus.Labels.Empty ) );
 
 			// Check for label name collisions.
-			var allLabelNames = ( labelNames ?? new string[ 0 ] ).Concat( staticLabels.Names ).ToList();
+			var allLabelNames = ( labelNames ?? Array.Empty<string>() ).Concat( staticLabels.Names ).ToList();
 			if ( allLabelNames.Count() != allLabelNames.Distinct( StringComparer.Ordinal ).Count() )
 				throw new InvalidOperationException( "The set of label names includes duplicates: " + string.Join( ", ", allLabelNames ) );
 
