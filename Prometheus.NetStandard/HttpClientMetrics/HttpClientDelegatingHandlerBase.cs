@@ -73,7 +73,7 @@ namespace Prometheus.HttpClientMetrics
 					labelValues[ i ] = request.Method.Method;
 					break;
 				case HttpClientRequestLabelNames.Uri:
-					labelValues[ i ] = request.RequestUri.AbsolutePath;
+					labelValues[ i ] = GetUriLabelValue( request );
 					break;
 				case HttpClientRequestLabelNames.Status:
 					labelValues[ i ] = response != null ? ( (int)response.StatusCode ).ToString() : "";
@@ -98,17 +98,10 @@ namespace Prometheus.HttpClientMetrics
 				throw new ArgumentException( $"Provided custom HttpClient metric instance for {GetType().Name} has some unexpected labels: {string.Join( ", ", unexpected )}." );
 		}
 
-		private T GetFirstHeaderValueOrDefault<T>( HttpRequestMessage response, string headerKey, T defaultValue ) {
-			if ( !response.Content.Headers.TryGetValues( headerKey, out IEnumerable<string> headerValues ) ) {
-				return defaultValue;
-			}
-
-			var valueString = headerValues.FirstOrDefault();
-			if ( valueString != null ) {
-				return (T)Convert.ChangeType( valueString, typeof( T ) );
-			}
-
-			return defaultValue;
+		private string GetUriLabelValue( HttpRequestMessage request ) {
+			return request.Properties.TryGetValue( "RequestRoutePattern", out var route )
+				? route.ToString()
+				: request.RequestUri.AbsoluteUri;
 		}
 	}
 }

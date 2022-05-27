@@ -78,11 +78,11 @@
 
 		static Metrics() {
 			DefaultRegistry = new CollectorRegistry();
-			DefaultRegistry.SetBeforeFirstCollectCallback( delegate {
-				// We include some metrics by default, just to give some output when a user first uses the library.
-				// These are not designed to be super meaningful/useful metrics.
-				DotNetStats.Register( DefaultRegistry );
-			} );
+			//DefaultRegistry.SetBeforeFirstCollectCallback( delegate {
+			//	// We include some metrics by default, just to give some output when a user first uses the library.
+			//	// These are not designed to be super meaningful/useful metrics.
+			//	DotNetStats.Register( DefaultRegistry );
+			//} );
 
 			_defaultFactory = new MetricFactory( DefaultRegistry );
 		}
